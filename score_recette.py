@@ -1,45 +1,5 @@
 import pandas as pd
 
-def score_nutrition(list_composition, percent_fruit):
-
-    point_A = score_energy(list_composition[0]) + score_sucre(list_composition[1])
-    point_A += score_acid(list_composition[2]) + score_sodium(list_composition[3])
-
-    fruit_score = score_fruit(percent_fruit)
-
-    point_C = score_fibre(list_composition[4]) + fruit_score
-
-    if fruit_score == 5:
-        point_C += score_protein(list_composition[5])
-
-    score_nutri = point_A - point_C
-
-    return score_nutri
-
-def score(list_of_ingredients, list_weight):
-    index = [9, 18, 17, 61, 26, 14, 3]
-
-    list_composition = [0, 0, 0, 0, 0, 0]
-    total_weight_vegetable = 0
-    total_weight_other = 0
-
-    for i in range(len(list_of_ingredients)):
-        for y in range(len(index)):
-            value = ( * list_weight[i]) / 100
-            list_composition += value
-        if index[-1] == "fruits, vegetables, legumes and nuts":
-            total_weight_vegetable += list_weight[i]
-        else:
-            total_weight_other += list_weight[i]
-
-    total_weight = total_weight_vegetable + total_weight_other
-    percent_of_vegetable = (total_weight_vegetable * 100) / total_weight
-
-    for i in range(len(list_composition)):
-        list_composition[i] = (list_composition[i] * 100) / total_weight
-
-    return score_nutrition(list_composition, percent_of_vegetable)
-
 def score_energy(energy_value):
     if energy_value <= 335:
         return 0
@@ -168,3 +128,54 @@ def score_fruit(percent):
     if percent > 80:
         return 5
     return 2
+
+def get_from_file(ingredient):
+    df = pd.read_csv('./data/Table Ciqual 2020_ENG_2020 07 07.csv')
+    val = df.loc[df['alim_nom_eng'].str.contains(ingredient, case=False)]
+    return val.iloc[2]
+
+def score_nutrition(list_composition, percent_fruit):
+
+    point_A = score_energy(list_composition[0]) + score_sucre(list_composition[1])
+    point_A += score_acid(list_composition[2]) + score_sodium(list_composition[3])
+
+    fruit_score = score_fruit(percent_fruit)
+
+    point_C = score_fibre(list_composition[4]) + fruit_score
+
+    if fruit_score == 5:
+        point_C += score_protein(list_composition[5])
+
+    score_nutri = point_A - point_C
+
+    return score_nutri
+
+    # list de string en args
+def score(list_of_ingredients, list_weight):
+    index = [9, 18, 17, 60, 26, 14, 3]
+
+    list_composition = [0, 0, 0, 0, 0, 0]
+    total_weight_vegetable = 0
+    total_weight_other = 0
+
+    for i in range(len(list_of_ingredients)):
+        ingredient = get_from_file(list_of_ingredients[i])
+        for y in range(len(list_composition)):
+            listatus_composition[y] += float(ingredient.iloc[index[y]].replace(',','.')) * list_weight[i] / 100
+        if ingredient.iloc[index[-1]] == "fruits, vegetables, legumes and nuts":
+            total_weight_vegetable += list_weight[i]
+        else:
+            total_weight_other += list_weight[i]
+
+    total_weight = total_weight_vegetable + total_weight_other
+    percent_of_vegetable = (total_weight_vegetable * 100) / total_weight
+
+    for i in range(len(list_composition)):
+        list_composition[i] = (list_composition[i] * 100) / total_weight
+
+    return score_nutrition(list_composition, percent_of_vegetable)
+
+
+a = score(["Egg, raw"], [200])
+print(a);
+
