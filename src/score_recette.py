@@ -1,5 +1,12 @@
 import pandas as pd
 
+def calculate(score):
+    if (score < 0):
+        return 100
+    score = score * 100 / 40;
+    score = 100 -  score
+    return score
+
 def score_energy(energy_value):
     if energy_value <= 335:
         return 0
@@ -130,7 +137,7 @@ def score_fruit(percent):
     return 2
 
 def get_from_file(ingredient):
-    df = pd.read_csv('./data/Table Ciqual 2020_ENG_2020 07 07.csv')
+    df = pd.read_csv('./src/data/Table Ciqual 2020_ENG_2020 07 07.csv')
     val = df.loc[df['alim_nom_eng'] ==  ingredient]
     return val.iloc[0]
 
@@ -174,7 +181,8 @@ def score(list_of_ingredients, list_weight):
     for i in range(len(list_composition)):
         list_composition[i] = (list_composition[i] * 100) / total_weight
 
-    return score_nutrition(list_composition, percent_of_vegetable)
+    score =  score_nutrition(list_composition, percent_of_vegetable)
+    return calculate(score)
 
 
 a = score(["Fresh egg pasta, cooked, unsalted", "Cucumber, pulp and peel, raw", "Tomato, raw", "Pine nuts", "Avocado, pulp, raw"], [100, 100, 100, 25, 200])
