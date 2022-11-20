@@ -131,8 +131,8 @@ def score_fruit(percent):
 
 def get_from_file(ingredient):
     df = pd.read_csv('./data/Table Ciqual 2020_ENG_2020 07 07.csv')
-    val = df.loc[df['alim_nom_eng'].str.contains(ingredient, case=False)]
-    return val.iloc[2]
+    val = df.loc[df['alim_nom_eng'] ==  ingredient]
+    return val.iloc[0]
 
 def score_nutrition(list_composition, percent_fruit):
 
@@ -161,7 +161,8 @@ def score(list_of_ingredients, list_weight):
     for i in range(len(list_of_ingredients)):
         ingredient = get_from_file(list_of_ingredients[i])
         for y in range(len(list_composition)):
-            listatus_composition[y] += float(ingredient.iloc[index[y]].replace(',','.')) * list_weight[i] / 100
+            num = 0 if ingredient.iloc[index[y]] == "-" else float(ingredient.iloc[index[y]].replace(',', '.'))
+            list_composition[y] += num * list_weight[i] / 100
         if ingredient.iloc[index[-1]] == "fruits, vegetables, legumes and nuts":
             total_weight_vegetable += list_weight[i]
         else:
@@ -176,6 +177,6 @@ def score(list_of_ingredients, list_weight):
     return score_nutrition(list_composition, percent_of_vegetable)
 
 
-a = score(["Egg, raw"], [200])
+a = score(["Fresh egg pasta, cooked, unsalted", "Cucumber, pulp and peel, raw", "Tomato, raw", "Pine nuts", "Avocado, pulp, raw"], [100, 100, 100, 25, 200])
 print(a);
 
